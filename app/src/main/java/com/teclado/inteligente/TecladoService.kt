@@ -139,8 +139,11 @@ class TecladoService : InputMethodService() {
     private fun aplicarSugestao(t: TextView) {
         val ic = currentInputConnection ?: return
         val s = t.text.toString()
-        if (s.isBlank()) return
-        ic.deleteSurroundingText(buffer.length, 0)
+        val atual = buffer.toString()
+        if (s.isBlank() || atual.isBlank()) return
+        val antes = ic.getTextBeforeCursor(atual.length, 0)?.toString()
+        if (antes != atual) return
+        ic.deleteSurroundingText(atual.length, 0)
         ic.commitText("$s ", 1)
         buffer.setLength(0)
         atualizarSugestoes()
@@ -155,8 +158,22 @@ class TecladoService : InputMethodService() {
     }
 
     private fun digitarSimbolo(s: String) {
+        val ic = currentInputConnection ?: return
+        if (s == " " && ic.getTextBeforeCursor(1, 0)?.toString() == " ") {
+            ic.deleteSurroundingText(1, 0)
+            ic.commitText(". ", 1)
+            buffer.setLength(0)
+            maiuscula = true
+            atualizarCase()
+            atualizarSugestoes()
+            return
+        }
         fechar()
-        currentInputConnection?.commitText(s, 1)
+        ic.commitText(s, 1)
+        if (s == "." || s == "!" || s == "?") {
+            maiuscula = true
+            atualizarCase()
+        }
     }
 
     private fun apagar() {
@@ -236,7 +253,7 @@ class TecladoService : InputMethodService() {
         val corEspecial = "#2A2A30"
 
         val l1 = linha(raiz)
-        "1234567890".forEach { c -> l1.addView(tecla(c.toString(), 1f, corEspecial) { digitarSimbolo(c.toString()) }) }
+        "1234567890".forEach { c -> l1.addView(tecla(c.toString(), 1f, corEspecial) { digitarLetra(c.toString()) }) }
 
         val l2 = linha(raiz)
         "qwertyuiop".forEach { c ->
