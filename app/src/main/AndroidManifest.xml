@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:label="Teclado Inteligente" android:allowBackup="false">
+    <application android:label="XFLUX Teclado Inteligente" android:allowBackup="false">
         <service
             android:name=".TecladoService"
-            android:label="Teclado Inteligente"
+            android:label="XFLUX Teclado Inteligente"
             android:exported="true"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -11,5 +11,8 @@
             </intent-filter>
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
+        <receiver
+            android:name=".SpeechReceiver"
+            android:exported="false" />
     </application>
 </manifest>
